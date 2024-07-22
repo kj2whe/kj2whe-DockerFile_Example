@@ -1,0 +1,21 @@
+﻿# Use a base image that supports .NET and PowerShell if available, or install .NET as needed
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+
+# Install .NET SDK/Runtime if not already included
+# Add here commands to install .NET if the image does not include it
+
+# Now proceed with setting up your application and PowerShell
+WORKDIR /app
+
+# Assuming PowerShell is installed or included
+COPY ["myUserCert.pfx", "myMachineCert.pfx", "./"]
+
+# Use PowerShell for further commands
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
+
+# Install certificates
+RUN Import-PfxCertificate -FilePath C:\app\myUserCert.pfx -CertStoreLocation Cert:\CurrentUser\My -Password (ConvertTo-SecureString -String "!!050206!!Qzwxecrv!!" -Force -AsPlainText)
+RUN Import-PfxCertificate -FilePath C:\app\myMachineCert.pfx -CertStoreLocation Cert:\LocalMachine\My -Password (ConvertTo-SecureString -String "!!050206!!Qzwxecrv!!" -Force -AsPlainText)
+
+# Copy and build your .NET application as before
+# ...
