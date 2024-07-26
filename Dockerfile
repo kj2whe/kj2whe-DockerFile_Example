@@ -11,7 +11,7 @@ RUN dotnet --list-sdks
 COPY ["DockerTestSolution1.csproj", "./"]
 RUN dotnet restore "DockerTestSolution1.csproj"
 
-RUN dotnet dev-certs https --trust
+# RUN dotnet dev-certs https --trust
 
 # Copy the rest of the source code from the host to the container
 COPY . .
