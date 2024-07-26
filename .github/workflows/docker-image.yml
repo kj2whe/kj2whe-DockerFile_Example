@@ -22,7 +22,7 @@ jobs:
         password: ${{ secrets.GHCR_TOKEN }}
         
     - name: Build and push Docker image
-      uses: docker/build-push-action@v1
+      uses: mr-smithers-excellent/docker-build-push@v6.4
       with:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GHCR_TOKEN }}
