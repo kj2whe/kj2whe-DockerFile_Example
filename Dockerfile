@@ -1,5 +1,5 @@
 ﻿# Use the specified Windows Server Core image as the base image
-FROM windows-dotnet-sdk-8 as build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-windowsservercore-ltsc2022 as build
 
 WORKDIR /src
 
@@ -24,7 +24,9 @@ RUN dotnet publish "DockerTestSolution1.csproj" -c Release -o /app/publish
 
 # Runtime stage: uses the .NET runtime to run the application
 # FROM windows-dotnet-runtime-8 as runtime
-FROM windows-dotnet-sdk-8 as runtime
+FROM mcr.microsoft.com/dotnet/sdk:8.0-windowsservercore-ltsc2022 as runtime
+
+ARG PFX_PASSWORD
 
 # Verify installation by printing the .NET version
 RUN dotnet --version
@@ -44,13 +46,11 @@ USER $APP_UID
 COPY ["myUserCert.pfx", "myMachineCert.pfx", "./"]
 
 # Using PowerShell to handle certificate import
-#SHELL ["powershell", "-Command"]
-
 # Import certificates to the appropriate stores
 RUN powershell -Command \
     $ErrorActionPreference = 'Stop'; \
-    Import-PfxCertificate -FilePath c:\app\myUserCert.pfx -CertStoreLocation Cert:\CurrentUser\My -Password (ConvertTo-SecureString -String "SomePassWord" -Force -AsPlainText); \
-    Import-PfxCertificate -FilePath c:\app\myMachineCert.pfx -CertStoreLocation Cert:\LocalMachine\My -Password (ConvertTo-SecureString -String "SomePassWord" -Force -AsPlainText) 
+    Import-PfxCertificate -FilePath c:\app\myUserCert.pfx -CertStoreLocation Cert:\CurrentUser\My -Password (ConvertTo-SecureString -String $env:PFX_PASSWORD -Force -AsPlainText); \
+    Import-PfxCertificate -FilePath c:\app\myMachineCert.pfx -CertStoreLocation Cert:\LocalMachine\My -Password (ConvertTo-SecureString -String $env:PFX_PASSWORD -Force -AsPlainText) 
 
 # Set the entry point for the container, specifying the DLL to run
 ENTRYPOINT ["dotnet", "DockerTestSolution1.dll"]
