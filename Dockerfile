@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0-windowsservercore-ltsc2022 as build
 
 WORKDIR /src
 
-# Verify installation by printing the .NET version
+# Verify installation by printing the .NET version.
 RUN dotnet --version
 RUN dotnet --list-sdks
 
